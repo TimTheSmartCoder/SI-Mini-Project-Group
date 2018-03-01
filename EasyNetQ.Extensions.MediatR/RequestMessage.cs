@@ -7,18 +7,18 @@ using MediatR;
 
 namespace EasyNetQ
 {
-    public abstract class RequestMessageHandler<TMessage>
-        : IRequestHandler<RequestMessage<TMessage>>
-        where TMessage : class
+    public class RequestMessage<TMessage>
+        : IRequest where TMessage : class
     {
-        public Task Handle(
-            RequestMessage<TMessage> requestMessage,
-            CancellationToken cancellationToken)
+        public RequestMessage(TMessage message)
         {
-            return Task.Factory.StartNew(
-                () => this.Run(requestMessage.Message));
+            if (message == null)
+                throw new ArgumentNullException(nameof(message));
+
+            this.Message = message;
         }
 
-        public abstract void Run(TMessage message);
+        public TMessage Message { get; }
     }
+
 }

@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\EasyNetQ.Extensions.MediatR\EasyNetQ.Extensions.MediatR.csproj" />
+    <ProjectReference Include="..\Warehouse.Messages\Warehouse.Messages.csproj" />
   </ItemGroup>
 
 </Project>

@@ -6,6 +6,7 @@ using EasyNetQ;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Warehouse.Messages;
 
 namespace Warehouse.IMS
 {
@@ -13,15 +14,24 @@ namespace Warehouse.IMS
         : BaseApplication
     {
         private readonly IBus bus;
+        private readonly IMediator mediator;
 
         public WarehouseIMS(string name) 
             : base(name)
         {
             this.bus = this.GetService<IBus>();
+            this.mediator = this.GetService<IMediator>();
         }
 
         public override void Start(string[] args)
-        { }
+        {
+            var location = args[0];
+
+            this.bus.SubscribeAsync<OrderRequest>(
+                this.configuration["Name"], 
+                this.mediator,
+                c => c.WithTopic("Location.ALL").WithTopic($"Location.{location}"));
+        }
 
         public override void Stop()
         {

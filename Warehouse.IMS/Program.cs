@@ -13,7 +13,7 @@ namespace Warehouse.IMS
 
             IApplication application = new WarehouseIMS($"Warehouse.{countryCode}");
 
-            application.Start(args);
+            application.Start(new string[] { countryCode });
 
             Console.ReadLine();
 
