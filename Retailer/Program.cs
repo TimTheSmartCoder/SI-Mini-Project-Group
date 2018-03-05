@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core.Application;
 
 namespace Retailer.Client
@@ -7,7 +8,7 @@ namespace Retailer.Client
     {
         static void Main(string[] args)
         {
-            IApplication application = new RetailerClient("Retailer");
+            IApplication application = new RetailerClient("Retailer", new Dictionary<string, string>());
 
             application.Start(args);
 

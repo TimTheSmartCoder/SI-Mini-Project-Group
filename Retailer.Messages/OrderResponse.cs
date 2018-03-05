@@ -11,7 +11,9 @@ namespace Retailer.Messages
             string sender, 
             string product, 
             DateTime? delivery,
-            OrderResponseStatus status)
+            double shippingCharge,
+            int stock,
+            string shippingFrom)
         {
             if (string.IsNullOrWhiteSpace(id))
                 throw new ArgumentNullException(nameof(id));
@@ -24,20 +26,17 @@ namespace Retailer.Messages
             this.Sender = sender;
             this.Product = product;
             this.Delivery = delivery;
-            this.Status = status;
+            this.ShippingCharge = shippingCharge;
+            this.Stock = stock;
+            this.ShippingFrom = shippingFrom;
         }
 
         public string Id { get; }
         public string Sender { get; }
         public string Product { get; }
         public DateTime? Delivery { get; }
-        public OrderResponseStatus Status { get; }
-
-        public enum OrderResponseStatus
-        {
-            Success,
-            OutOfStock,
-            Failure
-        }
+        public double ShippingCharge { get; }
+        public int Stock { get; }
+        public string ShippingFrom { get; }
     }
 }

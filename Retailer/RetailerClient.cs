@@ -6,6 +6,7 @@ using EasyNetQ;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Retailer.Client.Utils;
 using Retailer.Messages;
 
@@ -16,32 +17,34 @@ namespace Retailer.Client
     {
         private readonly IBus bus;
         private readonly IMediator mediator;
+        private readonly ILogger<RetailerClient> logger;
 
-        public RetailerClient(string name) 
-            : base(name)
+        public RetailerClient(string name, Dictionary<string, string> configuration) 
+            : base(name, configuration)
         {
             this.bus = this.GetService<IBus>();
             this.mediator = this.GetService<IMediator>();
+            this.logger = this.GetService<ILogger<RetailerClient>>();
         }
 
         public override void Start(string[] args)
         {
-            this.bus.SubscribeAsync<Retailer.Messages.OrderRequest>("Retailer", this.mediator);
-            this.bus.Receive<Warehouse.Messages.OrderResponse>("Retailer", this.mediator);
+            this.logger.LogInformation("Starting to listen for incoming messages.");
 
-            this.bus.Subscribe<Retailer.Messages.OrderResponse>(
-                "Customer1", message =>
-                {
-                    Console.WriteLine("Received response.");
-                },
-                x => x.WithTopic("Customer.Customer1"));
+            var subscription = this.bus.Receive("Retailer", 
+                x => x
+                    .Add<Retailer.Messages.OrderRequest>(this.mediator)
+                    .Add< Warehouse.Messages.OrderResponse>(this.mediator));
 
-            this.bus.Publish(new Retailer.Messages.OrderRequest(
-                Guid.NewGuid().ToString(),
-                "DK",
-                "Simon",
-                "Customer1"));
+            this.logger.LogInformation("Listening for messages.");
             
+            Console.ReadLine();
+
+            this.logger.LogInformation("Stopping listening for messages.");
+            
+            subscription.Dispose();
+
+            this.logger.LogInformation("Stopped listening for messages.");
         }
 
         public override void Stop()

@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\Retailer.Messages\Retailer.Messages.csproj" />
   </ItemGroup>
 
 </Project>

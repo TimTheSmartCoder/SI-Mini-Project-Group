@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core.Application;
 
 namespace Warehouse.IMS
@@ -7,13 +8,31 @@ namespace Warehouse.IMS
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Plase type in country code: ");
+            string country = "DK";
+            string inStock = "false";
 
-            string countryCode = Console.ReadLine();
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Please type in country for warehouse: ");
+                country = Console.ReadLine();
 
-            IApplication application = new WarehouseIMS($"Warehouse.{countryCode}");
+                Console.WriteLine("Should response with the in stock? (true or false):");
+                inStock = Console.ReadLine();
+            }
+            else
+            {
+                country = args[0];
+            }
 
-            application.Start(new string[] { countryCode });
+            var configuration = new Dictionary<string, string>()
+            {
+                { "Country", country },
+                { "InStock", inStock }
+            };
+
+            IApplication application = new WarehouseIMS($"Warehouse.{country}", configuration);
+
+            application.Start(new string[] { });
 
             Console.ReadLine();
 

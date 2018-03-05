@@ -11,35 +11,31 @@ using Retailer.Messages;
 
 namespace Retailer.Client.CommandHandlers
 {
-    public class SendCustomerSuccesResponse : IRequest
+    public class SendCustomerFailureResponse 
+        : IRequest
     {
-        public SendCustomerSuccesResponse(
-            Retailer.Messages.OrderRequest customerOrderRequest,
-            Warehouse.Messages.OrderResponse warehouseOrderResponse)
+        public SendCustomerFailureResponse(
+            Retailer.Messages.OrderRequest customerOrderRequest)
         {
             if (customerOrderRequest == null)
                 throw new ArgumentNullException(nameof(customerOrderRequest));
-            if(warehouseOrderResponse == null)
-                throw  new ArgumentNullException(nameof(warehouseOrderResponse));
 
             this.CustomerOrderRequest = customerOrderRequest;
-            this.WarehouseOrderResponse = warehouseOrderResponse;
         }
 
         public Retailer.Messages.OrderRequest CustomerOrderRequest { get; }
-        public Warehouse.Messages.OrderResponse WarehouseOrderResponse { get; }
     }
 
-    public class SendCustomerSuccesResponseHandler 
-        : IRequestHandler<SendCustomerSuccesResponse>
+    public class SendCustomerFailureResponseHandler
+        : IRequestHandler<SendCustomerFailureResponse>
     {
         private readonly IBus bus;
-        private readonly ILogger<SendCustomerSuccesResponseHandler> logger;        
+        private readonly ILogger<SendCustomerFailureResponseHandler> logger;
         private readonly IConfiguration configuration;
 
-        public SendCustomerSuccesResponseHandler(
-            IBus bus, 
-            ILogger<SendCustomerSuccesResponseHandler> logger, 
+        public SendCustomerFailureResponseHandler(
+            IBus bus,
+            ILogger<SendCustomerFailureResponseHandler> logger,
             IConfiguration configuration)
         {
             this.bus = bus;
@@ -47,23 +43,23 @@ namespace Retailer.Client.CommandHandlers
             this.configuration = configuration;
         }
 
-        public Task Handle(SendCustomerSuccesResponse message, CancellationToken cancellationToken)
+        public Task Handle(SendCustomerFailureResponse message, CancellationToken cancellationToken)
         {
             var sender = this.configuration["Name"];
-            
+
             // Response to the customer for the order request.
             var customerResponse = new Retailer.Messages.OrderResponse(
                 Guid.NewGuid().ToString(),
                 sender,
                 message.CustomerOrderRequest.Product,
-                message.WarehouseOrderResponse.Delivery,
-                message.WarehouseOrderResponse.ShippingCharge,
-                message.WarehouseOrderResponse.Stock,
-                message.WarehouseOrderResponse.ShippingFrom);
+                null,
+                0.0,
+                0,
+                "");
 
             this.bus.Publish(customerResponse, $"Customer.{message.CustomerOrderRequest.Sender}");
 
-            this.logger.LogInformation("Sent order response success to customer.");
+            this.logger.LogInformation("Sent failure order response to customer.");
 
             return Task.FromResult(true);
         }

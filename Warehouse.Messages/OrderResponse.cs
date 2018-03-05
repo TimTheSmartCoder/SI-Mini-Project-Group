@@ -10,8 +10,10 @@ namespace Warehouse.Messages
             string id,
             string sender,
             string correlationId,
-            OrderResponseStatus status,
-            DateTime delivery)
+            DateTime? delivery,
+            double shippingCharge,
+            int stock,
+            string shippingFrom)
         {
             if(string.IsNullOrWhiteSpace(id))
                 throw  new ArgumentNullException(nameof(id));
@@ -23,16 +25,19 @@ namespace Warehouse.Messages
             this.Id = id;
             this.Sender = sender;
             this.CorrelationId = correlationId;
-            this.Status = status;
             this.Delivery = delivery;
-
+            this.ShippingCharge = shippingCharge;
+            this.Stock = stock;
+            this.ShippingFrom = shippingFrom;
         }
 
         public string Id { get; }
         public string Sender { get; }
         public string CorrelationId { get; }
-        public OrderResponseStatus Status { get; }
-        public DateTime Delivery { get; }
+        public DateTime? Delivery { get; }
+        public double ShippingCharge { get; }
+        public int Stock { get; }
+        public string ShippingFrom { get; }
     }
 
     public enum OrderResponseStatus

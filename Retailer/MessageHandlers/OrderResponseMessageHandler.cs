@@ -6,6 +6,7 @@ using EasyNetQ;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Retailer.Client.CommandHandlers;
 using Retailer.Client.Utils;
 using Warehouse.Messages;
 
@@ -39,50 +40,7 @@ namespace Retailer.Client.MessageHandlers
             this.logger = logger;
         }
 
-        private void SendResponse(
-            Retailer.Messages.OrderRequest customerOrderRequest,
-            Warehouse.Messages.OrderResponse warehouseOrderResponse,
-            Retailer.Messages.OrderResponse.OrderResponseStatus status)
-        {
-            var sender = this.configuration["Name"];
-
-            DateTime? delivery = null;
-
-            if (warehouseOrderResponse != null)
-                delivery = warehouseOrderResponse.Delivery;
-
-            // Response to the customer for the order request.
-            var customerResponse = new Retailer.Messages.OrderResponse(
-                Guid.NewGuid().ToString(),
-                sender,
-                customerOrderRequest.Product,
-                delivery,
-                status);
-
-            this.bus.Publish(customerResponse, $"Customer.{customerOrderRequest.Sender}");
-        }
-
-        private void SendToAllWarehouses(
-            Retailer.Messages.OrderRequest customerOrderRequest)
-        {
-            var sender = this.configuration["Name"];
-            var correlationId = Guid.NewGuid().ToString();
-
-            var warehouseORderRequest = new Warehouse.Messages.OrderRequest(
-                Guid.NewGuid().ToString(), 
-                customerOrderRequest.CountryCode, 
-                customerOrderRequest.Product, 
-                sender, 
-                correlationId);
-
-            var aggreateRequest = new Aggregate<Retailer.Messages.OrderRequest, Warehouse.Messages.OrderResponse>(
-                correlationId, 2, customerOrderRequest);
-
-            this.globalOrderRequests.Add(correlationId, aggreateRequest);
-
-            this.bus.Publish(warehouseORderRequest, "Location.ALL");
-        }
-
+       
         public override Task Run(OrderResponse response)
         {
             // Check if response is for a local warehouse request.
@@ -101,17 +59,22 @@ namespace Retailer.Client.MessageHandlers
                 // answer for the local warehouse request.
                 this.localOrderRequests.Remove(localWarehouseResponse.CorrelationId);
 
-                if (response.Status == OrderResponseStatus.Succes)
+                if (response.Stock != 0)
                 {
                     // Recevied and successfull response from the warehouse
                     // so we can respond to the customer.
-                    SendResponse(customerOrderRequest, localWarehouseResponse, Retailer.Messages.OrderResponse.OrderResponseStatus.Success);
+                    this.mediator.Send(new SendCustomerSuccesResponse(
+                        customerOrderRequest, 
+                        localWarehouseResponse));
+
+                    //SendResponse(customerOrderRequest, localWarehouseResponse, Retailer.Messages.OrderResponse.OrderResponseStatus.Success);
                 }
                 else
                 {
                     // The response from the local warehouse were not successfull, either a failure
                     // our out of stock, so we contact all warehouses instead.
-                    SendToAllWarehouses(customerOrderRequest);
+                    //SendToAllWarehouses(customerOrderRequest);
+                    this.mediator.Send(new SendOrderRequestToAllWarehouses(customerOrderRequest));
                 }
 
             }
@@ -134,25 +97,21 @@ namespace Retailer.Client.MessageHandlers
                 {
                     // Get the best response from the warehouse, we have gotton.
                     var bestResponseForCustomer =
-                        requestAggregate.GetResult(x => x.Status == OrderResponseStatus.Succes);
+                        requestAggregate.GetResult(x => x.Stock != 0);
 
                     if (bestResponseForCustomer == null)
                     {
                         // No response were successfull, so we notify the user  that
                         // the product they requested is out of stock.
-                        SendResponse(
-                            requestAggregate.Request, 
-                            null, 
-                            Retailer.Messages.OrderResponse.OrderResponseStatus.Failure);
+                        this.mediator.Send(new SendCustomerFailureResponse(
+                            requestAggregate.Request));
                     }
                     else
                     {
                         // Response were successfull and we can notify the user
                         // about the response.
-                        SendResponse(
-                            requestAggregate.Request, 
-                            bestResponseForCustomer,
-                            Retailer.Messages.OrderResponse.OrderResponseStatus.Failure);
+                        this.mediator.Send(new SendCustomerSuccesResponse(
+                            requestAggregate.Request, bestResponseForCustomer));
                     }
 
                     // Remove the aggregate because it is complete we have received

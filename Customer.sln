@@ -13,9 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Retailer.Client", "Retailer\Retailer.Client.csproj", "{105FE87B-96D9-4997-933F-5F1569B2ABDB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Retailer.Messages", "Retailer.Messages\Retailer.Messages.csproj", "{44BD1277-51BB-4D44-9922-5DF8FD79BB39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Retailer.Messages", "Retailer.Messages\Retailer.Messages.csproj", "{44BD1277-51BB-4D44-9922-5DF8FD79BB39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Warehouse.Messages", "Warehouse.Messages\Warehouse.Messages.csproj", "{D89C5CD9-8B8F-4677-8193-DE6CDD8AE209}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Warehouse.Messages", "Warehouse.Messages\Warehouse.Messages.csproj", "{D89C5CD9-8B8F-4677-8193-DE6CDD8AE209}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

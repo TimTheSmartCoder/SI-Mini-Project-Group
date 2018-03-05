@@ -17,8 +17,8 @@ namespace Retailer.Client.Utils
 
             this.CorrelationId = correlationId;
             this.numberOfResponsesForComplete = numberOfResponsesForComplete;
-
             this.responses = new List<TResponse>();
+            this.Request = request;
         }
 
         public string CorrelationId { get;  }

@@ -14,7 +14,7 @@ namespace Core.Application
         protected readonly IConfiguration configuration;
         private readonly IServiceProvider serviceProvider;
 
-        protected BaseApplication(string name)
+        protected BaseApplication(string name, Dictionary<string, string> configuration)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentNullException(nameof(name));
@@ -25,6 +25,7 @@ namespace Core.Application
                 {
                     { "Name", name }
                 })
+                .AddInMemoryCollection(configuration)
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
                 .Build();
