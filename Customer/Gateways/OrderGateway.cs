@@ -87,10 +87,10 @@ namespace Customer.Client.Gateways
             var name = this.configuration["Name"];
 
             // Create subscription from name.
-            var subscriptionId = $"Customer.{name}";
+            var topic = $"Customer.{name}";
 
-            this.bus.Subscribe<OrderResponse>(subscriptionId, (orderResponse) =>
-            {
+            this.bus.Subscribe<OrderResponse>(name, (orderResponse) =>
+            {               
                 // Lock the current thread, to wake the thread up from sleep.
 
                 lock (this)
@@ -101,7 +101,7 @@ namespace Customer.Client.Gateways
                     // Wake up thread.
                     Monitor.Pulse(this);
                 }
-            });
+            }, c => c.WithTopic(topic));
         }
     }
 }
