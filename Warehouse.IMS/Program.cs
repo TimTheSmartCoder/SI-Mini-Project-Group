@@ -13,10 +13,10 @@ namespace Warehouse.IMS
 
             if (args.Length == 0)
             {
-                Console.WriteLine("Please type in country for warehouse: ");
+                Console.WriteLine("Please type in country code for warehouse: ");
                 country = Console.ReadLine();
 
-                Console.WriteLine("Should response with the in stock? (true or false):");
+                Console.WriteLine("Should response with the product, be in stock? (true or false):");
                 inStock = Console.ReadLine();
             }
             else

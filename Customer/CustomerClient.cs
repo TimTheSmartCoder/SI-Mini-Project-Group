@@ -46,7 +46,7 @@ namespace Customer.Client
                 Console.WriteLine($"Error: {e.Message}");
             }
 
-            Console.WriteLine("Type quit to exit, or enter to continue.");
+            Console.WriteLine("Press Enter to exit application");
         }
 
         public override void Stop()

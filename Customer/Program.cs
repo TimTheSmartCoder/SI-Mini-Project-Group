@@ -21,10 +21,10 @@ namespace Customer.Client
                 Console.WriteLine("Please type in name of customer: ");
                 name = Console.ReadLine();
 
-                Console.WriteLine("Please type in country for customer: ");
+                Console.WriteLine("Please type in country code for customer: ");
                 country = Console.ReadLine();
 
-                Console.WriteLine("Please type in product to order:");
+                Console.WriteLine("Please type in product name to order:");
                 product = Console.ReadLine();
             }
             else
